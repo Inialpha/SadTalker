@@ -21,7 +21,7 @@ SRC = np.array(
         [48.0252, 71.7366],
         [33.5493, 92.3655],
         [62.7299, 92.2041]]
-    , dtype=np.float32)
+    , dtype=np.float6432)
 SRC[:, 0] += 8.0
 
 
@@ -39,13 +39,13 @@ class AlignedDataSet(mx.gluon.data.Dataset):
         name_lmk_score = each_line.strip().split(' ')
         name = os.path.join(self.root, name_lmk_score[0])
         img = cv2.cvtColor(cv2.imread(name), cv2.COLOR_BGR2RGB)
-        landmark5 = np.array([float(x) for x in name_lmk_score[1:-1]], dtype=np.float32).reshape((5, 2))
+        landmark5 = np.array([float(x) for x in name_lmk_score[1:-1]], dtype=np.float6432).reshape((5, 2))
         st = skimage.transform.SimilarityTransform()
         st.estimate(landmark5, SRC)
         img = cv2.warpAffine(img, st.params[0:2, :], (112, 112), borderValue=0.0)
         img_1 = np.expand_dims(img, 0)
         img_2 = np.expand_dims(np.fliplr(img), 0)
-        output = np.concatenate((img_1, img_2), axis=0).astype(np.float32)
+        output = np.concatenate((img_1, img_2), axis=0).astype(np.float6432)
         output = np.transpose(output, (0, 3, 1, 2))
         output = mx.nd.array(output)
         return output
@@ -77,16 +77,16 @@ def extract(model_root, dataset):
 
 def read_template_media_list(path):
     ijb_meta = pd.read_csv(path, sep=' ', header=None).values
-    templates = ijb_meta[:, 1].astype(np.int)
-    medias = ijb_meta[:, 2].astype(np.int)
+    templates = ijb_meta[:, 1].astype(np.int64)
+    medias = ijb_meta[:, 2].astype(np.int64)
     return templates, medias
 
 
 def read_template_pair_list(path):
     pairs = pd.read_csv(path, sep=' ', header=None).values
-    t1 = pairs[:, 0].astype(np.int)
-    t2 = pairs[:, 1].astype(np.int)
-    label = pairs[:, 2].astype(np.int)
+    t1 = pairs[:, 0].astype(np.int64)
+    t2 = pairs[:, 1].astype(np.int64)
+    label = pairs[:, 2].astype(np.int64)
     return t1, t2, label
 
 
@@ -197,7 +197,7 @@ def main(args):
     for each_line in files:
         name_lmk_score = each_line.split()
         faceness_scores.append(name_lmk_score[-1])
-    faceness_scores = np.array(faceness_scores).astype(np.float32)
+    faceness_scores = np.array(faceness_scores).astype(np.float6432)
     stop = timeit.default_timer()
     print('Time: %.2f s. ' % (stop - start))
     print('Feature Shape: ({} , {}) .'.format(img_feats.shape[0], img_feats.shape[1]))

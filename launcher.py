@@ -27,20 +27,19 @@ def check_python_version():
     micro = sys.version_info.micro
 
     if is_windows:
-        supported_minors = [10]
+        supported_minors = [10, 11, 12]
     else:
-        supported_minors = [7, 8, 9, 10, 11]
+        supported_minors = [8, 9, 10, 11, 12]
 
     if not (major == 3 and minor in supported_minors):
-
-        raise (f"""
+        raise RuntimeError(f"""
 INCOMPATIBLE PYTHON VERSION
-This program is tested with 3.10.6 Python, but you have {major}.{minor}.{micro}.
+This program is tested with Python 3.8-3.12, but you have {major}.{minor}.{micro}.
 If you encounter an error with "RuntimeError: Couldn't install torch." message,
 or any other error regarding unsuccessful package (library) installation,
-please downgrade (or upgrade) to the latest version of 3.10 Python
+please switch to a supported Python version (3.8-3.12)
 and delete current Python and "venv" folder in WebUI's directory.
-You can download 3.10 Python from here: https://www.python.org/downloads/release/python-3109/
+You can download Python from here: https://www.python.org/downloads/
 {"Alternatively, use a binary release of WebUI: https://github.com/AUTOMATIC1111/stable-diffusion-webui/releases" if is_windows else ""}
 Use --skip-python-version-check to suppress this warning.
 """)
@@ -170,7 +169,9 @@ def run_extension_installer(extension_dir):
 def prepare_environment():
     global skip_install
 
-    torch_command = os.environ.get('TORCH_COMMAND', "pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113")
+    check_python_version()
+
+    torch_command = os.environ.get('TORCH_COMMAND', "pip install --upgrade torch torchvision torchaudio")
 
     ## check windows 
     if sys.platform != 'win32':
