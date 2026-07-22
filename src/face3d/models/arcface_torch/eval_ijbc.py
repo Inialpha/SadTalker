@@ -66,7 +66,7 @@ class Embedding(object):
             [65.5318, 51.5014],
             [48.0252, 71.7366],
             [33.5493, 92.3655],
-            [62.7299, 92.2041]], dtype=np.float32)
+            [62.7299, 92.2041]], dtype=np.float6432)
         src[:, 0] += 8.0
         self.src = src
         self.batch_size = batch_size
@@ -77,7 +77,7 @@ class Embedding(object):
         assert landmark.shape[0] == 68 or landmark.shape[0] == 5
         assert landmark.shape[1] == 2
         if landmark.shape[0] == 68:
-            landmark5 = np.zeros((5, 2), dtype=np.float32)
+            landmark5 = np.zeros((5, 2), dtype=np.float6432)
             landmark5[0] = (landmark[36] + landmark[39]) / 2
             landmark5[1] = (landmark[42] + landmark[45]) / 2
             landmark5[2] = landmark[30]
@@ -120,8 +120,8 @@ def divideIntoNstrand(listTemp, n):
 def read_template_media_list(path):
     # ijb_meta = np.loadtxt(path, dtype=str)
     ijb_meta = pd.read_csv(path, sep=' ', header=None).values
-    templates = ijb_meta[:, 1].astype(np.int)
-    medias = ijb_meta[:, 2].astype(np.int)
+    templates = ijb_meta[:, 1].astype(np.int64)
+    medias = ijb_meta[:, 2].astype(np.int64)
     return templates, medias
 
 
@@ -132,10 +132,10 @@ def read_template_pair_list(path):
     # pairs = np.loadtxt(path, dtype=str)
     pairs = pd.read_csv(path, sep=' ', header=None).values
     # print(pairs.shape)
-    # print(pairs[:, 0].astype(np.int))
-    t1 = pairs[:, 0].astype(np.int)
-    t2 = pairs[:, 1].astype(np.int)
-    label = pairs[:, 2].astype(np.int)
+    # print(pairs[:, 0].astype(np.int64))
+    t1 = pairs[:, 0].astype(np.int64)
+    t2 = pairs[:, 1].astype(np.int64)
+    label = pairs[:, 2].astype(np.int64)
     return t1, t2, label
 
 
@@ -160,7 +160,7 @@ def get_image_feature(img_path, files_list, model_path, epoch, gpu_id):
     rare_size = len(files) % batch_size
     faceness_scores = []
     batch = 0
-    img_feats = np.empty((len(files), 1024), dtype=np.float32)
+    img_feats = np.empty((len(files), 1024), dtype=np.float6432)
 
     batch_data = np.empty((2 * batch_size, 3, 112, 112))
     embedding = Embedding(model_path, data_shape, batch_size)
@@ -169,7 +169,7 @@ def get_image_feature(img_path, files_list, model_path, epoch, gpu_id):
         img_name = os.path.join(img_path, name_lmk_score[0])
         img = cv2.imread(img_name)
         lmk = np.array([float(x) for x in name_lmk_score[1:-1]],
-                       dtype=np.float32)
+                       dtype=np.float6432)
         lmk = lmk.reshape((5, 2))
         input_blob = embedding.get(img, lmk)
 
@@ -189,7 +189,7 @@ def get_image_feature(img_path, files_list, model_path, epoch, gpu_id):
         img_name = os.path.join(img_path, name_lmk_score[0])
         img = cv2.imread(img_name)
         lmk = np.array([float(x) for x in name_lmk_score[1:-1]],
-                       dtype=np.float32)
+                       dtype=np.float6432)
         lmk = lmk.reshape((5, 2))
         input_blob = embedding.get(img, lmk)
         batch_data[2 * img_index][:] = input_blob[0]
@@ -200,9 +200,9 @@ def get_image_feature(img_path, files_list, model_path, epoch, gpu_id):
                       rare_size:][:] = embedding.forward_db(batch_data)
             batch += 1
         faceness_scores.append(name_lmk_score[-1])
-    faceness_scores = np.array(faceness_scores).astype(np.float32)
-    # img_feats = np.ones( (len(files), 1024), dtype=np.float32) * 0.01
-    # faceness_scores = np.ones( (len(files), ), dtype=np.float32 )
+    faceness_scores = np.array(faceness_scores).astype(np.float6432)
+    # img_feats = np.ones( (len(files), 1024), dtype=np.float6432) * 0.01
+    # faceness_scores = np.ones( (len(files), ), dtype=np.float6432 )
     return img_feats, faceness_scores
 
 

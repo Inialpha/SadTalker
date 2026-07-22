@@ -57,7 +57,7 @@ def check_all_files(current_dir):
 
 def download_model(local_dir='./checkpoints'):
     REPO_ID = 'vinthony/SadTalker'
-    snapshot_download(repo_id=REPO_ID, local_dir=local_dir, local_dir_use_symlinks=False)
+    snapshot_download(repo_id=REPO_ID, local_dir=local_dir)
 
 def get_source_image(image):   
         return image
@@ -106,15 +106,16 @@ def get_default_checkpoint_path():
 def install():
 
     kv = {
-        "face_alignment": "face-alignment==1.3.5",
-        "imageio": "imageio==2.19.3",
-        "imageio_ffmpeg": "imageio-ffmpeg==0.4.7",
-        "librosa":"librosa==0.8.0",
+        "face_alignment": "face-alignment==1.4.1",
+        "imageio": "imageio==2.35.1",
+        "imageio_ffmpeg": "imageio-ffmpeg==0.5.1",
+        "librosa":"librosa==0.10.2.post1",
         "pydub":"pydub==0.25.1",
-        "scipy":"scipy==1.8.1",
+        "scipy":"scipy==1.11.4",
         "tqdm": "tqdm",
         "yacs":"yacs==0.1.8",
         "yaml": "pyyaml", 
+        "gradio": "gradio>=4.44,<5",
         "av":"av",
         "gfpgan": "gfpgan",
     }
