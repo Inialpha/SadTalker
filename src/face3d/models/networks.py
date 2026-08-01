@@ -17,6 +17,7 @@ except ImportError:
 from typing import Type, Any, Callable, Union, List, Optional
 from .arcface_torch.backbones import get_model
 from kornia.geometry import warp_affine
+from src.utils.torch_compat import safe_torch_load
 
 def resize_n_crop(image, M, dsize=112):
     # image: (b, c, h, w)
@@ -76,7 +77,7 @@ class ReconNetWrapper(nn.Module):
         func, last_dim = func_dict[net_recon]
         backbone = func(use_last_fc=use_last_fc, num_classes=self.fc_dim)
         if init_path and os.path.isfile(init_path):
-            state_dict = filter_state_dict(torch.load(init_path, map_location='cpu'))
+            state_dict = filter_state_dict(safe_torch_load(init_path, map_location='cpu'))
             backbone.load_state_dict(state_dict)
             print("loading init net_recon %s from %s" %(net_recon, init_path))
         self.backbone = backbone
@@ -109,7 +110,7 @@ class RecogNetWrapper(nn.Module):
         super(RecogNetWrapper, self).__init__()
         net = get_model(name=net_recog, fp16=False)
         if pretrained_path:
-            state_dict = torch.load(pretrained_path, map_location='cpu')
+            state_dict = safe_torch_load(pretrained_path, map_location='cpu')
             net.load_state_dict(state_dict)
             print("loading pretrained net_recog %s from %s" %(net_recog, pretrained_path))
         for param in net.parameters():

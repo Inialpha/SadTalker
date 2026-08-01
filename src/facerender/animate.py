@@ -23,6 +23,7 @@ from pydub import AudioSegment
 from src.utils.face_enhancer import enhancer_generator_with_len, enhancer_list
 from src.utils.paste_pic import paste_pic
 from src.utils.videoio import save_video_with_watermark
+from src.utils.torch_compat import safe_torch_load
 
 try:
     import webui  # in webui
@@ -114,7 +115,7 @@ class AnimateFromCoeff():
                         kp_detector=None, he_estimator=None, optimizer_generator=None, 
                         optimizer_discriminator=None, optimizer_kp_detector=None, 
                         optimizer_he_estimator=None, device="cpu"):
-        checkpoint = torch.load(checkpoint_path, map_location=torch.device(device))
+        checkpoint = safe_torch_load(checkpoint_path, map_location=torch.device(device))
         if generator is not None:
             generator.load_state_dict(checkpoint['generator'])
         if kp_detector is not None:
@@ -142,7 +143,7 @@ class AnimateFromCoeff():
     
     def load_cpk_mapping(self, checkpoint_path, mapping=None, discriminator=None,
                  optimizer_mapping=None, optimizer_discriminator=None, device='cpu'):
-        checkpoint = torch.load(checkpoint_path,  map_location=torch.device(device))
+        checkpoint = safe_torch_load(checkpoint_path, map_location=torch.device(device))
         if mapping is not None:
             mapping.load_state_dict(checkpoint['mapping'])
         if discriminator is not None:
@@ -254,4 +255,3 @@ class AnimateFromCoeff():
         os.remove(new_audio_path)
 
         return return_path
-

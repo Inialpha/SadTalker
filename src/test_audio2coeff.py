@@ -12,9 +12,10 @@ from src.audio2pose_models.audio2pose import Audio2Pose
 from src.audio2exp_models.networks import SimpleWrapperV2 
 from src.audio2exp_models.audio2exp import Audio2Exp
 from src.utils.safetensor_helper import load_x_from_safetensor  
+from src.utils.torch_compat import safe_torch_load
 
 def load_cpk(checkpoint_path, model=None, optimizer=None, device="cpu"):
-    checkpoint = torch.load(checkpoint_path, map_location=torch.device(device))
+    checkpoint = safe_torch_load(checkpoint_path, map_location=torch.device(device))
     if model is not None:
         model.load_state_dict(checkpoint['model'])
     if optimizer is not None:
@@ -53,7 +54,7 @@ class Audio2Coeff():
         netG = SimpleWrapperV2()
         netG = netG.to(device)
         for param in netG.parameters():
-            netG.requires_grad = False
+            param.requires_grad = False
         netG.eval()
         try:
             if sadtalker_path['use_safetensor']:
@@ -119,5 +120,4 @@ class Audio2Coeff():
         #### relative head pose
         coeffs_pred_numpy[:, 64:70] = coeffs_pred_numpy[:, 64:70] + ( refpose_coeff[:num_frames, :] - refpose_coeff[0:1, :] )
         return coeffs_pred_numpy
-
 

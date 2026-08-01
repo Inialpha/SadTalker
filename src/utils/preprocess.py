@@ -17,6 +17,7 @@ from src.utils.croper import Preprocesser
 import warnings
 
 from src.utils.safetensor_helper import load_x_from_safetensor 
+from src.utils.torch_compat import safe_torch_load
 warnings.filterwarnings("ignore")
 
 def split_coeff(coeffs):
@@ -53,7 +54,7 @@ class CropAndExtract():
             checkpoint = safetensors.torch.load_file(sadtalker_path['checkpoint'])    
             self.net_recon.load_state_dict(load_x_from_safetensor(checkpoint, 'face_3drecon'))
         else:
-            checkpoint = torch.load(sadtalker_path['path_of_net_recon_model'], map_location=torch.device(device))    
+            checkpoint = safe_torch_load(sadtalker_path['path_of_net_recon_model'], map_location=torch.device(device))
             self.net_recon.load_state_dict(checkpoint['net_recon'])
 
         self.net_recon.eval()

@@ -116,7 +116,7 @@ Community tutorials: [中文Windows教程 (Chinese Windows tutorial)](https://ww
 
 A video tutorial in chinese is available [here](https://www.bilibili.com/video/BV1Dc411W7V6/). You can also follow the following instructions:
 
-1. Install [Python 3.8](https://www.python.org/downloads/windows/) and check "Add Python to PATH".
+1. Install [Python 3.12](https://www.python.org/downloads/windows/) and check "Add Python to PATH".
 2. Install [git](https://git-scm.com/download/win) manually or using [Scoop](https://scoop.sh/): `scoop install git`.
 3. Install `ffmpeg`, following [this tutorial](https://www.wikihow.com/Install-FFmpeg-on-Windows) or using [scoop](https://scoop.sh/): `scoop install ffmpeg`.
 4. Download the SadTalker repository by running `git clone https://github.com/Winfredy/SadTalker.git`.
@@ -148,6 +148,40 @@ We also provide an offline patch (`gfpgan/`), so no model will be downloaded whe
 * [Baidu (百度云盘)](https://pan.baidu.com/s/1kb1BCPaLOWX1JJb9Czbn6w?pwd=sadt) (Password: `sadt`)
 
 <!-- TODO add Hugging Face links -->
+
+## Google Colab (Python 3.12, fresh runtime)
+
+Use this minimal Colab workflow to run SadTalker in a clean runtime:
+
+```python
+# 1) System deps
+!apt-get update -y
+!apt-get install -y ffmpeg
+```
+
+```python
+# 2) Clone + install
+!git clone https://github.com/OpenTalker/SadTalker.git
+%cd SadTalker
+!python -m pip install -U pip setuptools wheel
+!python -m pip install -U torch torchvision torchaudio
+!python -m pip install -r requirements.txt
+```
+
+```python
+# 3) Download checkpoints (includes GFPGAN/facexlib offline weights)
+!bash scripts/download_models.sh
+```
+
+```python
+# 4) Example inference
+!python inference.py \
+  --driven_audio examples/driven_audio/bus_chinese.wav \
+  --source_image examples/source_image/full_body_1.png \
+  --enhancer gfpgan
+```
+
+Generated videos are written under `results/`.
 
 ### GFPGAN Offline Patch
 
