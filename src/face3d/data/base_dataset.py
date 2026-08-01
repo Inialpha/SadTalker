@@ -9,6 +9,16 @@ from PIL import Image
 import torchvision.transforms as transforms
 from abc import ABC, abstractmethod
 
+try:
+    BICUBIC_RESAMPLE = Image.Resampling.BICUBIC
+except AttributeError:
+    BICUBIC_RESAMPLE = Image.BICUBIC
+
+try:
+    AFFINE_TRANSFORM = Image.Transform.AFFINE
+except AttributeError:
+    AFFINE_TRANSFORM = Image.AFFINE
+
 
 class BaseDataset(data.Dataset, ABC):
     """This class is an abstract base class (ABC) for datasets.
@@ -95,8 +105,8 @@ def get_affine_mat(opt, size):
     affine_inv = np.linalg.inv(affine)
     return affine, affine_inv, flip
 
-def apply_img_affine(img, affine_inv, method=Image.BICUBIC):
-    return img.transform(img.size, Image.AFFINE, data=affine_inv.flatten()[:6], resample=Image.BICUBIC)
+def apply_img_affine(img, affine_inv, method=BICUBIC_RESAMPLE):
+    return img.transform(img.size, AFFINE_TRANSFORM, data=affine_inv.flatten()[:6], resample=method)
 
 def apply_lm_affine(landmark, affine, flip, size):
     _, h = size

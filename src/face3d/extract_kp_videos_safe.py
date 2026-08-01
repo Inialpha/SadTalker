@@ -15,6 +15,7 @@ from facexlib.detection import init_detection_model
 
 from facexlib.utils import load_file_from_url
 from src.face3d.util.my_awing_arch import FAN
+from src.utils.torch_compat import safe_torch_load
 
 def init_alignment_model(model_name, half=False, device='cuda', model_rootpath=None):
     if model_name == 'awing_fan':
@@ -25,7 +26,7 @@ def init_alignment_model(model_name, half=False, device='cuda', model_rootpath=N
 
     model_path = load_file_from_url(
         url=model_url, model_dir='facexlib/weights', progress=True, file_name=None, save_dir=model_rootpath)
-    model.load_state_dict(torch.load(model_path, map_location=device)['state_dict'], strict=True)
+    model.load_state_dict(safe_torch_load(model_path, map_location=device)['state_dict'], strict=True)
     model.eval()
     model = model.to(device)
     return model

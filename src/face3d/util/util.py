@@ -10,6 +10,12 @@ import argparse
 from argparse import Namespace
 import torchvision
 
+try:
+    BICUBIC_RESAMPLE = Image.Resampling.BICUBIC
+    NEAREST_RESAMPLE = Image.Resampling.NEAREST
+except AttributeError:
+    BICUBIC_RESAMPLE = Image.BICUBIC
+    NEAREST_RESAMPLE = Image.NEAREST
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -107,9 +113,9 @@ def save_image(image_numpy, image_path, aspect_ratio=1.0):
     if aspect_ratio is None:
         pass
     elif aspect_ratio > 1.0:
-        image_pil = image_pil.resize((h, int(w * aspect_ratio)), Image.BICUBIC)
+        image_pil = image_pil.resize((h, int(w * aspect_ratio)), BICUBIC_RESAMPLE)
     elif aspect_ratio < 1.0:
-        image_pil = image_pil.resize((int(h / aspect_ratio), w), Image.BICUBIC)
+        image_pil = image_pil.resize((int(h / aspect_ratio), w), BICUBIC_RESAMPLE)
     image_pil.save(image_path)
 
 
@@ -160,19 +166,19 @@ def correct_resize_label(t, size):
         one_t = t[i, :1]
         one_np = np.transpose(one_t.numpy().astype(np.uint8), (1, 2, 0))
         one_np = one_np[:, :, 0]
-        one_image = Image.fromarray(one_np).resize(size, Image.NEAREST)
+        one_image = Image.fromarray(one_np).resize(size, NEAREST_RESAMPLE)
         resized_t = torch.from_numpy(np.array(one_image)).long()
         resized.append(resized_t)
     return torch.stack(resized, dim=0).to(device)
 
 
-def correct_resize(t, size, mode=Image.BICUBIC):
+def correct_resize(t, size, mode=BICUBIC_RESAMPLE):
     device = t.device
     t = t.detach().cpu()
     resized = []
     for i in range(t.size(0)):
         one_t = t[i:i + 1]
-        one_image = Image.fromarray(tensor2im(one_t)).resize(size, Image.BICUBIC)
+        one_image = Image.fromarray(tensor2im(one_t)).resize(size, mode)
         resized_t = torchvision.transforms.functional.to_tensor(one_image) * 2 - 1.0
         resized.append(resized_t)
     return torch.stack(resized, dim=0).to(device)

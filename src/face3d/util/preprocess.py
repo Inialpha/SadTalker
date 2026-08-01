@@ -9,8 +9,19 @@ import os
 from skimage import transform as trans
 import torch
 import warnings
-warnings.filterwarnings("ignore", category=np.exceptions.VisibleDeprecationWarning) 
+
+try:
+    _visible_deprecation_warning = np.exceptions.VisibleDeprecationWarning
+except AttributeError:
+    _visible_deprecation_warning = np.VisibleDeprecationWarning
+
+warnings.filterwarnings("ignore", category=_visible_deprecation_warning) 
 warnings.filterwarnings("ignore", category=FutureWarning) 
+
+try:
+    BICUBIC_RESAMPLE = Image.Resampling.BICUBIC
+except AttributeError:
+    BICUBIC_RESAMPLE = Image.BICUBIC
 
 
 # calculating least square problem for image alignment
@@ -48,11 +59,11 @@ def resize_n_crop_img(img, lm, t, s, target_size=224., mask=None):
     up = (h/2 - target_size/2 + float((h0/2 - t[1])*s)).astype(np.int32)
     below = up + target_size
 
-    img = img.resize((w, h), resample=Image.BICUBIC)
+    img = img.resize((w, h), resample=BICUBIC_RESAMPLE)
     img = img.crop((left, up, right, below))
 
     if mask is not None:
-        mask = mask.resize((w, h), resample=Image.BICUBIC)
+        mask = mask.resize((w, h), resample=BICUBIC_RESAMPLE)
         mask = mask.crop((left, up, right, below))
 
     lm = np.stack([lm[:, 0] - t[0] + w0/2, lm[:, 1] -
