@@ -15,6 +15,5 @@ joblib
 scikit-image
 facexlib
 gradio
-gfpgan
 av
 safetensors
