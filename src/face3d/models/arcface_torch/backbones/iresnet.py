@@ -138,7 +138,7 @@ class IResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        with torch.cuda.amp.autocast(self.fp16):
+        with torch.amp.autocast(device_type='cuda', enabled=self.fp16 and torch.cuda.is_available()):
             x = self.conv1(x)
             x = self.bn1(x)
             x = self.prelu(x)
@@ -184,4 +184,3 @@ def iresnet100(pretrained=False, progress=True, **kwargs):
 def iresnet200(pretrained=False, progress=True, **kwargs):
     return _iresnet('iresnet200', IBasicBlock, [6, 26, 60, 6], pretrained,
                     progress, **kwargs)
-
